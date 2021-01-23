@@ -29,12 +29,11 @@ class SubmitButton:
     def handleEvent(self, event , nextFunc , argument):
         if event.type == pg.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos) and argument:
-                print("successfully Loged In")
+                nextFunc()
+                return
             elif self.rect.collidepoint(event.pos) and not argument:
-                print("Password and Username does not match")
-        # self.textColor = self.activeColor if not self.active else self.inactiveColor
-        # self.buttonColor = self.activeColor if  self.active else self.inactiveColor
-        
+                return
+                
 
     def updateText(self, text: str):
         self.text = text

@@ -1,12 +1,23 @@
 import pygame as pg
+import os
 
-from components.TextInput import TextInput
+from DATABASE.DatabaseConnection import DatabaseConnection
+
 from pages.LandingPage import LandingPage 
+from pages.Dashboard import Dashboard 
 
+
+os.environ['SDL_VIDEO_CENTERED'] = '1'
+
+#! connecting to database
+connectionToDatabase = DatabaseConnection()
 
 #! initialize the game
 pg.init()
 
+
+info = pg.display.Info()
+screen_width,screen_height = info.current_w,info.current_h
 
 #! create screen
 screen = pg.display.set_mode((1000, 600))
@@ -26,22 +37,26 @@ def nextFunc():
 #! Game Loop
 
 frame1 = LandingPage(screen,nextFunc)
+dashboard = Dashboard(screen,nextFunc,screen_width,screen_height,connectionToDatabase)
 running = True
 
-FRAMES = [frame1]
+FRAMES = [frame1,dashboard]
 currentFrame = 0
+
 
 while running:
     screen.fill((255, 255, 255))
+    
 
     for e in pg.event.get():
-        frame1.handleEvent(e)
+        FRAMES[currentFrame].handleEvent(e)
         if e.type == pg.QUIT:
             running = False
 
     
     FRAMES[currentFrame].draw()
     pg.display.update()
+    pg.time.Clock().tick(60)
 
 
 

@@ -53,8 +53,8 @@ class LandingPage:
         self.SubmitButtonX = self.screen_w/2 + ((self.screen_w/2) - 200)//2
         self.SubmitButtonY = self.UsernameY + 100
         self.SubmitButton = SubmitButton(self.SubmitButtonX, self.SubmitButtonY,200,30,self.fontText,border_radius=5,border_thikness=0,textColor=self.redColor,bgColor=self.grayColor,text='LOGIN')
-    
-    
+
+
     def draw(self) :
         self.screen.blit(self.LogoImg,(self.LogoX,self.LogoY))
         self.Title.draw(self.screen)
@@ -68,9 +68,9 @@ class LandingPage:
     def handleEvent(self,event) :
         self.username.handleEvent(event)
         self.password.handleEvent(event)
-        self.SubmitButton.handleEvent(event,
-        self.nextFunc,
-        self.username.text == self.USERNAME and self.password.text == self.PASSWORD
-        )
-        
+        self.SubmitButton.handleEvent(  event,
+                                        self.nextFunc,
+                                        self.username.text == self.USERNAME and self.password.text == self.PASSWORD
+                                        )
+
 
