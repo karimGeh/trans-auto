@@ -61,16 +61,34 @@ class AddCardWin :
         self.addButton.draw(self.screen)
 
     def handleSubmit(self):
-        code = self.codeInput.text
-        x = self.Xinput.text
-        y = self.Yinput.text
+        code = self.codeInput.text.strip()
+        x = int(self.Xinput.text)
+        y = int(self.Yinput.text)
 
         if (
-            x and y and 
-            all(0<len(i)<4 for i in code.split() )
+            not (str(x) and str(y) and 
+            all(0<len(i) and len(i)<4 for i in code.split() ))
         ):
-            self.connectionToDatabase.CreateRFID(code,int(x),int(y))
-            self.updateFunc()
+            print('conditions not satisfied ')
+            return 
+
+        
+        Cards = self.connectionToDatabase.ReadAllRFID()
+        
+        if any( card['code'] == code for card in Cards) :
+            print('card already existing')
+            return
+
+        if any( (int(card['x']) == x and int(card['y']) == y ) for card in Cards):
+            print('position already occupied')
+            return
+        
+        self.connectionToDatabase.CreateRFID(code,int(x),int(y))
+        self.codeInput.updateText('')
+        self.Xinput.updateText('')
+        self.Yinput.updateText('')
+        self.updateFunc()
+
 
 
 

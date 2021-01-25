@@ -41,7 +41,7 @@ dashboard = Dashboard(screen,nextFunc,screen_width,screen_height,connectionToDat
 running = True
 
 FRAMES = [frame1,dashboard]
-currentFrame = 0
+currentFrame = 1
 
 
 while running:
@@ -50,6 +50,7 @@ while running:
 
     for e in pg.event.get():
         FRAMES[currentFrame].handleEvent(e)
+        
         if e.type == pg.QUIT:
             running = False
 

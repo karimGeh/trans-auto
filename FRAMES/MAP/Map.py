@@ -20,6 +20,8 @@ class Map :
         self.offsetYTemp = 0
         self.zoomCard = 1
         
+        self.fontP = pg.font.Font(None, 15)
+        
         self.ZoomIn = IconButton2(w - 90,
                                 h - 50,
                                 40,
@@ -115,6 +117,15 @@ class Map :
             x = self.graphicCards[card['id']]['x'] * self.zoom + self.offsetX
             y = (self.graphicCards[card['id']]['y'] - self.h) * self.zoom + self.h - self.offsetY
             pg.draw.circle(self.screen,'#dd0000',(x,y),5)
+            self.screen.blit(
+                self.fontP.render(
+                                    '{} ({}, {})'.format(card['id'],card['x'],card['y']),
+                                    True,
+                                    pg.Color('#000000')
+                                ),
+                (x+10 , y + 10)
+            )
+
 
         self.ZoomIn.draw(self.screen)
         self.ZoomOut.draw(self.screen)

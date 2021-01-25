@@ -34,6 +34,9 @@ class TextInput:
         self.textColor = self.activeColor if self.active else self.inactiveColor
         if event.type == pg.KEYDOWN:
             if self.active:
+                if event.key == pg.K_KP_ENTER or event.key == 13 :
+                    self.text += '\n'
+                    return
                 if event.key == pg.K_RETURN or event.key == pg.K_ESCAPE:
                     pass
                 elif event.key == pg.K_BACKSPACE:
@@ -48,6 +51,8 @@ class TextInput:
         self.text = text
 
     def draw(self, screen):
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        lines = self.text.splitlines()
+        for i, l in enumerate(lines):
+            screen.blit(self.font.render(l, True, self.textColor), (self.rect.x+5, self.rect.y+5 + 10*i))
         pg.draw.rect(screen, self.textColor, self.rect,
                      self.border_thikness, self.border_radius)

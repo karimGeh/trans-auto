@@ -15,6 +15,8 @@ class Settings :
         
         self.frame = pg.Rect(x, y, w, h)
 
+    def handleEvent(self,event):
+        pass
 
 
     def draw(self):

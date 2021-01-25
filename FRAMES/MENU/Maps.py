@@ -53,9 +53,9 @@ class Maps :
         
 
         self.AC = AddCardWin(self.screen,self.State,x,y,w,h,updateFunc,connectionToDatabase) 
-        self.RC = RemoveCardWin(self.screen,self.State,x,y,w,h) 
-        self.AL = AddLinkWin(self.screen,self.State,x,y,w,h) 
-        self.RL = RemoveLinkWin(self.screen,self.State,x,y,w,h) 
+        self.RC = RemoveCardWin(self.screen,self.State,x,y,w,h,updateFunc,connectionToDatabase) 
+        self.AL = AddLinkWin(self.screen,self.State,x,y,w,h,updateFunc,connectionToDatabase) 
+        self.RL = RemoveLinkWin(self.screen,self.State,x,y,w,h,updateFunc,connectionToDatabase) 
     
 
     def ACButtonsFunc(self):
@@ -133,9 +133,9 @@ class Maps :
         if self.State['RL'] :
             self.RL.handleEvent(event)
             return
-
+            
         self.AddCard.handleEvent(event,self.ACButtonsFunc ,True)
-        self.AddLink.handleEvent(event,self.RCButtonsFunc ,True)
+        self.RemoveCard.handleEvent(event,self.RCButtonsFunc ,True)
         
-        self.RemoveCard.handleEvent(event,self.ALButtonsFunc ,True)
+        self.AddLink.handleEvent(event,self.ALButtonsFunc ,True)
         self.RemoveLink.handleEvent(event,self.RLButtonsFunc ,True)

@@ -26,10 +26,10 @@ class SubmitButton:
         self.border_thikness = border_thikness
         self.border_radius = border_radius
 
-    def handleEvent(self, event , nextFunc , argument):
+    def handleEvent(self, event , nextFunc , argument , *args):
         if event.type == pg.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos) and argument:
-                nextFunc()
+                nextFunc(*args)
                 return
             elif self.rect.collidepoint(event.pos) and not argument:
                 return

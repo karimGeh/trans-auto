@@ -79,20 +79,42 @@ class Dashboard :
 
         #? MAP
 
-        self.Map = Map(self.screen,50 ,0,screen_width-50,screen_height,self.connectionToDatabase)
+        self.TheMap = Map(self.screen,50 ,0,screen_width-50,screen_height,self.connectionToDatabase)
 
         #? MENU
 
         self.RobotsMenu = Robots(self.screen,50 ,0,300,screen_height )
-        self.MapsMenu = Maps(self.screen,50 ,0,300,screen_height,self.Map.update,self.connectionToDatabase )
+        self.MapsMenu = Maps(self.screen,50 ,0,300,screen_height,self.TheMap.update,self.connectionToDatabase )
         self.PathsMenu = Paths(self.screen,50 ,0,300,screen_height )
         self.SettingsMenu = Settings(self.screen,50 ,0,300,screen_height )
 
 
 
     def draw(self) :
+        for robot in self.RobotsMenu.ListOfRobots :
+            if robot.connection.in_waiting:
+                cardCode = str(robot.connection.readline().decode('ascii'))
+                print(cardCode)
+                if robot.id not in self.PathsMenu.PATHS :
+                    print("no path available")
+                    break
+                for card in self.TheMap.Cards :
+                    # print('card',card['code'])
+                    # print(all( int(card['code'].split()[i]) == int(cardCode.split()[i]) for i in range(4)  ))
+                    if all( int(card['code'].split()[i]) == int(cardCode.split()[i]) for i in range(4)  ) :
+                        for command in self.PathsMenu.PATHS[robot.id][1:]:
+                            print(command)
+                            if int(command.split()[0]) == int(card['id']) :
+                                print(command.split()[1])
+                                robot.connection.write(bytearray(command.split()[1], "utf8"))
+                                if command.split()[1] =='A' :
+                                    self.PathsMenu.PATHS.pop(robot.id)
+                                return 
+                        
+                
+
         self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
-        self.Map.draw()
+        self.TheMap.draw()
         pg.draw.rect(self.screen,'#C6C5CA', self.side_menu,0)
         
         self.robot.draw(self.screen)
@@ -105,9 +127,9 @@ class Dashboard :
         if(self.STATE["mapCustomize"]):
             self.MapsMenu.draw()
         if(self.STATE["paths"]):
-            self.RobotsMenu.draw()
+            self.PathsMenu.draw()
         if(self.STATE["settings"]):
-            self.RobotsMenu.draw()
+            self.Settings.draw()
         
 
     def handleEvent(self,event) :
@@ -115,12 +137,13 @@ class Dashboard :
         self.paths.handleEvent(event,50,350)
         self.map.handleEvent(event,50,350)
         self.settings.handleEvent(event,50,350)
-        self.Map.handleEvent(event)
+        if not any(self.STATE[menu] for menu in self.STATE):
+            self.TheMap.handleEvent(event)
         if(self.STATE["robot"]):
             self.RobotsMenu.handleEvent(event)
         if(self.STATE["mapCustomize"]):
             self.MapsMenu.handleEvent(event)
         if(self.STATE["paths"]):
-            self.RobotsMenu.handleEvent(event)
+            self.PathsMenu.handleEvent(event,self.RobotsMenu.ListOfRobots,self.TheMap.Cards)
         if(self.STATE["settings"]):
-            self.RobotsMenu.handleEvent(event)
+            self.Settings.handleEvent(event)
