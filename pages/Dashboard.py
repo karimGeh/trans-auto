@@ -28,8 +28,10 @@ class Dashboard :
         self.grayColor = '#1D1D1D'
 
         self.screen = screen
-        self.screen_w = screen.get_width()
-        self.screen_h = screen.get_height()
+        self.screen_w = screen_width
+        self.screen_h = screen_height
+
+    
 
         self.robot = IconButton(int((self.MENU_WIDTH - self.ICON_WIDTH) / 2),
                                 10,
@@ -93,7 +95,11 @@ class Dashboard :
     def draw(self) :
         for robot in self.RobotsMenu.ListOfRobots :
             if robot.connection.in_waiting:
-                cardCode = str(robot.connection.readline().decode('ascii'))
+                cardCode = str(robot.connection.readline().decode('ascii')).strip()
+                card = list(filter(lambda c : c['code'] == cardCode,self.TheMap.Cards))
+                if len(card):
+                    x,y = card[0]['x'], card[0]['y']
+                    robot.position = (x,y)
                 print(cardCode)
                 if robot.id not in self.PathsMenu.PATHS :
                     print("no path available")
@@ -101,20 +107,38 @@ class Dashboard :
                 for card in self.TheMap.Cards :
                     # print('card',card['code'])
                     # print(all( int(card['code'].split()[i]) == int(cardCode.split()[i]) for i in range(4)  ))
-                    if all( int(card['code'].split()[i]) == int(cardCode.split()[i]) for i in range(4)  ) :
-                        for command in self.PathsMenu.PATHS[robot.id][1:]:
-                            print(command)
-                            if int(command.split()[0]) == int(card['id']) :
-                                print(command.split()[1])
-                                robot.connection.write(bytearray(command.split()[1], "utf8"))
-                                if command.split()[1] =='A' :
-                                    self.PathsMenu.PATHS.pop(robot.id)
-                                return 
+                    
+                    if not all( int(card['code'].split()[i]) == int(cardCode.split()[i]) for i in range(4)  ) :
+                        continue
+                    
+                    for commandIndex in range(1,len(self.PathsMenu.PATHS[robot.id])):
+                        command = self.PathsMenu.PATHS[robot.id][commandIndex]
+                        print(command)
+                        if int(command.split()[0]) == int(card['id']) :
+                            print(command.split()[1])
+                            robot.connection.write(bytearray(command.split()[1], "utf8"))
+                            
+                            if command.split()[1] =='A' :
+                                self.PathsMenu.PATHS.pop(robot.id)
+                            else :
+                                currentCard = self.TheMap.graphicCards[card['id']]
+                                nextCard    = self.TheMap.graphicCards[int(self.PathsMenu.PATHS[robot.id][commandIndex + 1].split()[0])]
+                                x_c  ,y_c = currentCard['x'] , currentCard['y'] * -1 + self.screen_h
+                                x_n  ,y_n = nextCard['x'] , nextCard['y'] * -1 + self.screen_h
+                                print(currentCard)
+                                print(nextCard)
+                                print(self.screen_h)
+                                print(x_c  ,y_c)
+                                print(x_n  ,y_n)
+                                robot.position = ((x_c + x_n) / 2 , (y_c + y_n) / 2)
+                                print(robot.position)
+
+                            return
                         
                 
 
         self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
-        self.TheMap.draw()
+        self.TheMap.draw(self.RobotsMenu.ListOfRobots)
         pg.draw.rect(self.screen,'#C6C5CA', self.side_menu,0)
         
         self.robot.draw(self.screen)

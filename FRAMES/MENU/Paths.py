@@ -71,9 +71,10 @@ class Paths :
             print("ROBOT " + ListCommands[0].split()[1] + " not found")
             return 
 
-        ListOfAvailableCards = map(lambda card : card['id'],ListOfAvailableCards)
+        ListOfAvailableCards = list(map(lambda card : int(card['id']),ListOfAvailableCards))
 
         if any( int(command.split()[0]) not in ListOfAvailableCards for command in ListCommands[1:-1]) :
+            print(ListOfAvailableCards)
             print("A CARD ID NOT IN MAP")
             return 
         

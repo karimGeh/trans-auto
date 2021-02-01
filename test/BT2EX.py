@@ -23,7 +23,7 @@ while(True):
     if ser.in_waiting:
         print(str(ser.readline().decode('ascii')))
     else:
-        ser.write(bytearray(str("A"), "utf8"))
+        ser.write(bytearray(str(input()), "utf8"))
     # data = str(ser.readline().decode('ascii'))
     # if data :
     #     print(data.split())

@@ -17,11 +17,13 @@
 // Arduino library
   #include <SPI.h>
   #include <MFRC522.h>
+  #include <Servo.h>    
+
 
 
 // Gears
   #define GEAR0 0
-  #define GEAR1 100
+  #define GEAR1 150
   #define GEAR2 125
   #define GEAR3 150
   #define GEAR4 175
@@ -41,8 +43,7 @@
 
 // IR PINS
   #define LeftIRS A8
-  #define CenterIRS A9
-  #define RightIRS A10
+  #define RightIRS A9
 
 // Bluetooth Connection
   #define CNX 45
@@ -51,15 +52,23 @@
   #define Trig 3
   #define Echo 2
 
+// Servo
+  #define servo 8
 
+// Angles
+  #define NORTH 84
+  #define RIGHT 180
+  #define LEFT  0
 
 
   int RobotState = 0;
   int executionL = 0;
   int executionR = 0;
+  int executionS = 0;
 
 // declaration
   MFRC522 rfid(SDA, RST);
+  Servo FrontServo;
 
 // Needed variabl
   char data;
@@ -115,6 +124,9 @@ void TurnRightLineFollower(int MOTORS_SPEED){
 }
 // Setup
 void setup() {
+
+
+  
   // initialize Serial
     Serial.begin(9600);
     Serial1.begin(9600);
@@ -138,10 +150,15 @@ void setup() {
     pinMode(Trig, OUTPUT);
     pinMode(Echo, INPUT); 
 
+  //initialize front servo
+    FrontServo.attach(servo);
+    FrontServo.write(NORTH);
+    //FrontServo.write(LEFT);
       
   // Stop Motors
     analogWrite(ENA,0);
     analogWrite(ENB,0);
+ 
 }
 
 
@@ -153,6 +170,7 @@ void loop() {
     delay(1000);
     return;
   }
+  Serial.println("Connected");
 
   // distance calculation
     digitalWrite(Trig, LOW);
@@ -165,7 +183,7 @@ void loop() {
     
     distance= duration*0.034/2;
 
-    if(distance <= 50 ){
+    if(distance <= 20 ){
       STOPMOTORS();
       delay(1000);
       return;
@@ -182,18 +200,34 @@ void loop() {
       if(data == 'B') RobotState = 1;
       if(data == 'C') RobotState = 2;
       if(data == 'N') {
+        FrontServo.write(NORTH);
+        delay(1000);
         ForwardLineFollower(GEAR1);
         RobotState = 1;
       }
       if(data == 'R'){
-        TurnRightFixedPosition(GEAR3);
+        FrontServo.write(RIGHT);
+        delay(1000);
+        //TurnRightFixedPosition(GEAR3);
+        TurnRightLineFollower(GEAR3);
         RobotState = 2;
         executionR = 1;
       }
       if(data == 'L'){
-        TurnLeftFixedPosition(GEAR3);
+        FrontServo.write(LEFT); 
+        delay(1000);    
+        //TurnLeftFixedPosition(GEAR3);
+        TurnLeftLineFollower(GEAR3);
         RobotState = 2;
         executionL = 1;
+      }
+      if(data == 'S'){
+        FrontServo.write(LEFT); 
+        delay(1000);    
+        //TurnLeftFixedPosition(GEAR3);
+        TurnLeftLineFollower(GEAR3);
+        RobotState = 2;
+        executionS = 1;
       }
     }
   // Robot State == 0
@@ -210,6 +244,7 @@ void loop() {
 
     // Line Follower
     if(RobotState == 1){
+      FrontServo.write(NORTH);
       Serial.println("Line Follower ---- RobotState == 1");
       if((LIRSstate > 500 && RIRSstate > 500) || LIRSstate < 500 && RIRSstate < 500) ForwardLineFollower(GEAR1) ;
       if(RIRSstate > 500 && LIRSstate < 500) TurnRightLineFollower(GEAR2);
@@ -234,6 +269,18 @@ void loop() {
         if(LIRSstate < 500 && executionL == 2){
           delay(100);
           executionL = 0;
+          STOPMOTORS();
+          RobotState = 1;
+          delay(100);
+        }
+      }
+      if(executionS > 0){
+        if(LIRSstate > 500 && executionS == 1) executionS = 2;
+        if(LIRSstate < 500 && executionS == 2) executionS = 3;
+        if(LIRSstate > 500 && executionS == 3) executionS = 4;
+        if(LIRSstate < 500 && executionS == 4){
+          delay(100);
+          executionS = 0;
           STOPMOTORS();
           RobotState = 1;
           delay(100);

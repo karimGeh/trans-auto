@@ -12,6 +12,7 @@ class RobotCard:
     """
 
     def __init__(self, connection,ListOfRobots,Port):
+        self.position = None
         self.id = Port[-1]
         self.redColor = '#C72026'
         self.grayColor = '#1D1D1D'
@@ -46,11 +47,6 @@ class RobotCard:
 
 
     def draw(self, screen):
-        
-
-
-        if self.connection.in_waiting:
-            self.currentPosition = str(self.connection.readline().decode('ascii'))
         pg.draw.rect(screen, '#002040', self.rect,0, 20)
         screen.blit(self.icon,(self.x+10,self.y+ (self.height - 32)//2))
         self.Status.draw(screen)

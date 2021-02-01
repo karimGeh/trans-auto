@@ -101,7 +101,7 @@ class Map :
                                                 'id2': link['second_end'],
                                             }
     
-    def draw(self):
+    def draw(self , ListOfRobots):
         
         pg.draw.rect(self.screen, "#ffffff", self.frame,
                      0, 0)
@@ -110,21 +110,26 @@ class Map :
             y1 = int((self.graphicCards[link['first_end']]['y']- self.h) * self.zoom + self.h - self.offsetY)
             x2 = int(self.graphicCards[link['second_end']]['x'] * self.zoom + self.offsetX)
             y2 = int((self.graphicCards[link['second_end']]['y'] - self.h) * self.zoom + self.h - self.offsetY)
-            pg.draw.line(self.screen,'#000000',(x1,y1),(x2,y2),2)
+            pg.draw.line(self.screen,'#000000',(x1,y1),(x2,y2),int(2 * self.zoom))
 
 
         for card in self.Cards:
             x = self.graphicCards[card['id']]['x'] * self.zoom + self.offsetX
             y = (self.graphicCards[card['id']]['y'] - self.h) * self.zoom + self.h - self.offsetY
-            pg.draw.circle(self.screen,'#dd0000',(x,y),5)
+            pg.draw.circle(self.screen,'#dd0000',(x,y),int(5*self.zoom))
             self.screen.blit(
                 self.fontP.render(
-                                    '{} ({}, {})'.format(card['id'],card['x'],card['y']),
+                                    '{} ({}, {})'.format(card['id'], card['x'], card['y']),
                                     True,
                                     pg.Color('#000000')
                                 ),
-                (x+10 , y + 10)
+                (x + 10 , y + 10)
             )
+        for robot in ListOfRobots :
+            if robot.position :
+                x = robot.position[0] * self.zoom + self.offsetX
+                y = -1 * robot.position[1] * self.zoom + self.h - self.offsetY
+                pg.draw.circle(self.screen, '#00dd00', (x,y), int(4 * self.zoom))
 
 
         self.ZoomIn.draw(self.screen)
