@@ -26,14 +26,13 @@ class SubmitButton:
         self.border_thikness = border_thikness
         self.border_radius = border_radius
 
-    def handleEvent(self, event , nextFunc , argument , *args):
+    def handleEvent(self, event, nextFunc, argument, *args):
         if event.type == pg.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos) and argument:
                 nextFunc(*args)
                 return
             elif self.rect.collidepoint(event.pos) and not argument:
                 return
-                
 
     def updateText(self, text: str):
         self.text = text
@@ -41,4 +40,8 @@ class SubmitButton:
     def draw(self, screen):
         pg.draw.rect(screen, self.buttonColor, self.rect,
                      self.border_thikness, self.border_radius)
-        screen.blit(self.txt_surface, (self.rect.x+(self.width-self.txt_surface.get_width())//2, self.rect.y+(self.height-self.txt_surface.get_height())//2))
+        screen.blit(
+            self.txt_surface,
+            (self.rect.x+(self.width-self.txt_surface.get_width())//2,
+             self.rect.y+(self.height-self.txt_surface.get_height())//2)
+        )
